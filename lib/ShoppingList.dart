@@ -28,12 +28,39 @@ class _ShoppingListState extends State<ShoppingList> {
   final _idController = TextEditingController();
   String id_spesa ="ABC123";
 
+  final List<String> entries = <String>['A', 'B', 'C', 'D', 'D', 'F', 'E', 'g'];
+  final List<int> colorCodes = <int>[100, 500, 100];
+
+  @override
+  void initState() {
+    super.initState();
+    _IdRetriever();
+  }
+
   void _incrementCounter() {
     setState(() {
 
     });
   }
 
+  void _IdRetriever() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final id_spesa_string = prefs.getString('ID_SPESA') ?? '';
+
+    print("preso da sharedpreferences: " +id_spesa_string);
+
+    if (id_spesa_string == null||id_spesa_string.isEmpty){
+      log("id_spesa =  null");
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const HomePage()),
+      );
+    }else{
+      setState(() {
+        this.id_spesa=id_spesa_string;
+      });
+    }
+  }
 
 
 
@@ -51,7 +78,12 @@ class _ShoppingListState extends State<ShoppingList> {
         body: SafeArea(
             child: Center(
               child: Column(children: [
+
+
+
                 SizedBox(height: 20),
+
+
 
                 Padding(
 
@@ -73,7 +105,7 @@ class _ShoppingListState extends State<ShoppingList> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              "Identificativo Spesa: ",
+                              "ID Spesa: ",
                               style: TextStyle(
                                 color: Colors.grey,
                                 fontSize: 16,
@@ -129,8 +161,58 @@ class _ShoppingListState extends State<ShoppingList> {
                       ),
                     ),
                   ),
-                )
+                ),
+
+                SizedBox(height: 12),
+
+                Column(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+
+                        width: double.infinity,
+                        height: 500,
+
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border.all(color: Colors.grey),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Expanded(
+                            child:ListView.builder(
+                                padding: const EdgeInsets.all(8),
+                                itemCount: entries.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  return Container(
+                                    height: 50,
+                                    color: Colors.white,
+                                    child: Center(child: Text('Entry ${entries[index]}')),
+                                  );
+                                }
+                            ),
+                          )
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+
+
+
+
+
+
+
               ],
+
+
+
+
              ),
             ),
 
@@ -144,42 +226,8 @@ class _ShoppingListState extends State<ShoppingList> {
       );
   }
 
-
-
-
-  void _IdRetriever() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    final id_spesa_string = prefs.getString('ID_SPESA') ?? '';
-
-    print("preso da sharedpreferences: " +id_spesa_string);
-
-    if (id_spesa_string == null||id_spesa_string.isEmpty){
-      log("id_spesa =  null");
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const HomePage()),
-      );
-    }else{
-      log("id_spesa = NOT null");
-      this.id_spesa = id_spesa_string;
-
-      print("ID SPESA:"+id_spesa_string);
-      updateState();
-      //idSpesaController.text = id_spesa;
-
-    }
-  }
-
-  void updateState(){
-      setState(() {
-        this.id_spesa=id_spesa;
-      });
-  }
-
   void _clearSharedPreferences() async{
-
     SharedPreferences prefs = await SharedPreferences.getInstance();
-
     prefs.setString('ID_SPESA', "");
   }
 }
