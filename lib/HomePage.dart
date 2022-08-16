@@ -128,6 +128,7 @@ class _HomePageState extends State<HomePage> {
 
     prefs.setString('ID_SPESA', id);
     // crea su firebase un oggetto con questo ID
+
   }
 
 

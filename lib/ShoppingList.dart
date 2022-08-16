@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'HomePage.dart';
+import 'package:flutter/services.dart';
 
 class ShoppingList extends StatefulWidget {
   const ShoppingList({Key? key}) : super(key: key);
@@ -148,6 +149,8 @@ class _ShoppingListState extends State<ShoppingList> {
                               ),
                             ),
                             onTap: () {
+
+                              Clipboard.setData(ClipboardData(text: id_spesa));
                               //show message on screen
                               log("tapped button copy id");
                               ScaffoldMessenger.of(context).showSnackBar(
@@ -192,13 +195,14 @@ class _ShoppingListState extends State<ShoppingList> {
                         itemBuilder: (BuildContext context, int index) {
                         final item = listaSpesa[index];
 
-
-                          return Container(
+                        return buildListTile(item);
+                          /*return Container(
                             height: 60,
                             color: Colors.white,
                             child: Center(
                                 child: Text(' ${listaSpesa[index]}')),
-                          );
+
+                          );*/
                         }
                     ),
 
@@ -232,6 +236,8 @@ class _ShoppingListState extends State<ShoppingList> {
 
 
     );
+
+
   }
 
   void _clearSharedPreferences() async {
@@ -267,4 +273,15 @@ class _ShoppingListState extends State<ShoppingList> {
     newItemInsertedController.clear();
 
   }
+
+  Widget buildListTile(String item)=> ListTile(
+    contentPadding: EdgeInsets.symmetric( horizontal: 20, vertical: 5),
+    title: Text(
+      item,
+      style: TextStyle(fontSize: 20),
+
+    ),
+
+    onTap: (){},
+  );
 }
