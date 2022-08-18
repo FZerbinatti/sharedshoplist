@@ -21,10 +21,11 @@ class _ShoppingListState extends State<ShoppingList> {
   //controller per prendere i dati dai fields
   late TextEditingController newItemInsertedController;
   String id_spesa = "ABC123";
-  List<String> listaSpesa = <String>["Latte", "Pane", "Uova", "Galline", "Coriandolo", "Bitcoin", "Cipolla", "Garrote", "CikiBriki"];
+  List<String> listaSpesa = <String>["Latte", "Pane", "Uova", "Tagliato", "Coriandolo", "Bitcoin", "Cipolla", "Garrote", "CikiBriki"];
   double height = 200;
   int bought_items_index=-1;
-  int bough_items_counter =0;
+  int added_items_counter =0;
+  var  bought_items_indexes = [];
 
   @override
   void initState() {
@@ -174,7 +175,7 @@ class _ShoppingListState extends State<ShoppingList> {
                   child: Container(
 
                     width: double.infinity,
-                    height: height - 140 -291,
+                    height: height - 140,
 
                     decoration: BoxDecoration(
                       color: Colors.white,
@@ -212,7 +213,8 @@ class _ShoppingListState extends State<ShoppingList> {
 
                               title: Text(
                             '$item',
-                            style: TextStyle(decoration: bought_items_index==index ? TextDecoration.lineThrough : TextDecoration.none)
+                                  //style: TextStyle(decoration: bought_items_index==index ? TextDecoration.lineThrough : TextDecoration.none)
+                                  style: TextStyle(decoration: bought_items_indexes.contains(index) ? TextDecoration.lineThrough : TextDecoration.none)
 
 
                             ),
@@ -288,6 +290,18 @@ class _ShoppingListState extends State<ShoppingList> {
 
 
   void _onSelected(int index) {
+
+    if (bought_items_indexes.isEmpty){
+      bought_items_indexes.add(listaSpesa.length-1);
+    }else{
+
+      for(var i = 0; i < bought_items_indexes.length; i++){
+        bought_items_indexes[i]= bought_items_indexes[i]-1;
+      }
+      bought_items_indexes.add(listaSpesa.length-1);
+    }
+
+
     setState(() {
       listaSpesa.add(listaSpesa[index]);
       listaSpesa.removeAt(index);
@@ -295,6 +309,3 @@ class _ShoppingListState extends State<ShoppingList> {
     });
   }
 }
-
-
-
