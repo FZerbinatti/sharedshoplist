@@ -10,32 +10,26 @@ class ShoppingList extends StatefulWidget {
   const ShoppingList({Key? key}) : super(key: key);
   // This widget is the root of your application.
 
-
-
   @override
   State<ShoppingList> createState()=> _ShoppingListState();
-
 
 }
 
 
-
-
 class _ShoppingListState extends State<ShoppingList> {
-
 
   //controller per prendere i dati dai fields
   late TextEditingController newItemInsertedController;
   String id_spesa = "ABC123";
-  List<String> listaSpesa = <String>["Latte", "Pane", "Uova"];
+  List<String> listaSpesa = <String>["Latte", "Pane", "Uova", "Galline", "Coriandolo", "Bitcoin", "Cipolla", "Garrote", "CikiBriki"];
   double height = 200;
-
+  int bought_items_index=-1;
+  int bough_items_counter =0;
 
   @override
   void initState() {
     super.initState();
     _IdRetriever();
-
     newItemInsertedController = TextEditingController();
   }
 
@@ -180,7 +174,7 @@ class _ShoppingListState extends State<ShoppingList> {
                   child: Container(
 
                     width: double.infinity,
-                    height: height - 140,
+                    height: height - 140 -291,
 
                     decoration: BoxDecoration(
                       color: Colors.white,
@@ -195,23 +189,41 @@ class _ShoppingListState extends State<ShoppingList> {
                         itemBuilder: (BuildContext context, int index) {
                         final item = listaSpesa[index];
 
-                        return buildListTile(item);
-                          /*return Container(
-                            height: 60,
-                            color: Colors.white,
-                            child: Center(
-                                child: Text(' ${listaSpesa[index]}')),
+                        return  Dismissible(
+                          key: UniqueKey(),
+                          onDismissed: (direction) {
+                            String current_item_name= listaSpesa[index];
+                            if (direction==DismissDirection.startToEnd){
 
-                          );*/
+                              _onSelected(index);
+
+                            }else{
+                              setState(() {
+                                listaSpesa.removeAt(index);
+                              });
+                            }
+
+
+                            // Then show a snackbar.
+                            ScaffoldMessenger.of(context)
+                                .showSnackBar(SnackBar(content: Text('$item Cancellato, direzione: $direction' )));
+                          },
+                            child: ListTile(
+
+                              title: Text(
+                            '$item',
+                            style: TextStyle(decoration: bought_items_index==index ? TextDecoration.lineThrough : TextDecoration.none)
+
+
+                            ),
+                          )
+                        );
                         }
                     ),
-
-
                   ),
                 ),
               ],
             ),
-
           ],
           ),
         ),
@@ -233,11 +245,7 @@ class _ShoppingListState extends State<ShoppingList> {
         child: const Icon(Icons.add),
         foregroundColor: Colors.black,
       ),
-
-
     );
-
-
   }
 
   void _clearSharedPreferences() async {
@@ -245,33 +253,28 @@ class _ShoppingListState extends State<ShoppingList> {
     prefs.setString('ID_SPESA', "");
   }
 
-
-
-    Future <String?> _alertDialogInsertItem() => showDialog <String> (
-            context: context,
-            builder: (context) =>
-                AlertDialog(
-                  title: Text("Nuovo Item"),
-                  elevation: 10,
-                  content: TextField(
-                    controller: newItemInsertedController,
-                    autofocus: true,
-                    decoration: InputDecoration(hintText: "Nome Prodotto"),
-                    onSubmitted: (_) => insertItem(),
-                  ),
-                  actions: [
-                    TextButton(onPressed: insertItem, child: Text("Inserisci"))
-                  ],
-                )
-        );
+  Future <String?> _alertDialogInsertItem() => showDialog <String> (
+          context: context,
+          builder: (context) =>
+              AlertDialog(
+                title: Text("Nuovo Item"),
+                elevation: 10,
+                content: TextField(
+                  controller: newItemInsertedController,
+                  autofocus: true,
+                  decoration: InputDecoration(hintText: "Nome Prodotto"),
+                  onSubmitted: (_) => insertItem(),
+                ),
+                actions: [
+                  TextButton(onPressed: insertItem, child: Text("Inserisci"))
+                ],
+              )
+      );
 
 
   void insertItem() {
-
     Navigator.of(context).pop(newItemInsertedController.text);
-
     newItemInsertedController.clear();
-
   }
 
   Widget buildListTile(String item)=> ListTile(
@@ -279,9 +282,19 @@ class _ShoppingListState extends State<ShoppingList> {
     title: Text(
       item,
       style: TextStyle(fontSize: 20),
-
     ),
-
     onTap: (){},
   );
+
+
+  void _onSelected(int index) {
+    setState(() {
+      listaSpesa.add(listaSpesa[index]);
+      listaSpesa.removeAt(index);
+      bought_items_index = listaSpesa.length-1;
+    });
+  }
 }
+
+
+
