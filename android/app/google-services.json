@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "259150313442",
+    "firebase_url": "https://sharedshoplist-17901-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "sharedshoplist-17901",
+    "storage_bucket": "sharedshoplist-17901.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:259150313442:android:99f10ffed896249f3eebbb",
+        "android_client_info": {
+          "package_name": "com.dreamsphere.sharedshoplist"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "259150313442-uqrqh8nepr1hmda0ddtbpmj9fmftptm6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCWkeebvi4nXfSCBSCgNm2Z0QwT-89h76g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "259150313442-uqrqh8nepr1hmda0ddtbpmj9fmftptm6.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "259150313442-cacfn13d71vgr2dl1c7a0shp1fh6lqlk.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.dreamsphere.sharedshoplist"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

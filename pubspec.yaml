@@ -37,6 +37,9 @@ dependencies:
   shared_preferences: ^2.0.15
   flutter_slidable: ^2.0.0
   slide_to_act: ^2.0.1
+  firebase_core: ^1.21.0
+  firebase_database: ^9.1.2
+  cloud_firestore: ^3.4.5
 
 dev_dependencies:
   flutter_test:

@@ -1,8 +1,10 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:sharedshoplist/Item.dart';
 import 'HomePage.dart';
 import 'package:flutter/services.dart';
 
@@ -21,11 +23,21 @@ class _ShoppingListState extends State<ShoppingList> {
   //controller per prendere i dati dai fields
   late TextEditingController newItemInsertedController;
   String id_spesa = "ABC123";
-  List<String> listaSpesa = <String>["Latte", "Pane", "Uova", "Tagliato", "Coriandolo", "Bitcoin", "Cipolla", "Garrote", "CikiBriki"];
+
+  //List<String> listaSpesa = <String>["Latte", "Pane", "Uova", "Tagliato", "Coriandolo", "Bitcoin", "Cipolla", "Garrote", "CikiBriki"];
+  List<String> listaSpesa = <String>[];
+
+  List<Item> listaSpesaItems = <Item>[];
+  //List<String> listaSpesa = <String>[];
+
   double height = 200;
   int bought_items_index=-1;
   int added_items_counter =0;
   var  bought_items_indexes = [];
+  var ref = "https://sharedshoplist-17901-default-rtdb.europe-west1.firebasedatabase.app" ;
+
+
+
 
   @override
   void initState() {
@@ -55,6 +67,11 @@ class _ShoppingListState extends State<ShoppingList> {
     } else {
       setState(() {
         this.id_spesa = id_spesa_string;
+
+        //load listviewspesa
+
+        getShopList(id_spesa_string);
+
       });
     }
     height = MediaQuery
@@ -175,7 +192,7 @@ class _ShoppingListState extends State<ShoppingList> {
                   child: Container(
 
                     width: double.infinity,
-                    height: height - 140,
+                    height: height - 150,
 
                     decoration: BoxDecoration(
                       color: Colors.white,
@@ -196,18 +213,22 @@ class _ShoppingListState extends State<ShoppingList> {
                             String current_item_name= listaSpesa[index];
                             if (direction==DismissDirection.startToEnd){
 
+                              crossItemFromFirebase(id_spesa, listaSpesa[index]);
                               _onSelected(index);
+
 
                             }else{
                               setState(() {
+                                removeItemFromFirebase(id_spesa, listaSpesa[index]);
                                 listaSpesa.removeAt(index);
+
                               });
                             }
 
 
-                            // Then show a snackbar.
+                            /*// Then show a snackbar.
                             ScaffoldMessenger.of(context)
-                                .showSnackBar(SnackBar(content: Text('$item Cancellato, direzione: $direction' )));
+                                .showSnackBar(SnackBar(content: Text('$item Cancellato, direzione: $direction' )));*/
                           },
                             child: ListTile(
 
@@ -238,6 +259,8 @@ class _ShoppingListState extends State<ShoppingList> {
           if (newItem == null || newItem.isEmpty) return;
 
           setState(() {
+
+
             listaSpesa.insert(listaSpesa.length, newItem);
           });
       },
@@ -276,6 +299,12 @@ class _ShoppingListState extends State<ShoppingList> {
 
   void insertItem() {
     Navigator.of(context).pop(newItemInsertedController.text);
+    //insert item on firebase
+
+    DatabaseReference databaseReference = FirebaseDatabase.instance.refFromURL(ref).child("shoplists_ids").child(id_spesa).child(newItemInsertedController.text);
+    databaseReference.set("0");
+
+
     newItemInsertedController.clear();
   }
 
@@ -290,16 +319,33 @@ class _ShoppingListState extends State<ShoppingList> {
 
 
   void _onSelected(int index) {
-
+    //log("index: "+index.toString()+"/"+bought_items_indexes.single);
+    //log("elemento da crossare:" + bought_items_indexes[index]);
+    // what if i cross an already-crossed element?
     if (bought_items_indexes.isEmpty){
       bought_items_indexes.add(listaSpesa.length-1);
     }else{
+      /*log("l'elemento è già crossato? " + bought_items_indexes.contains(index).toString());
+      if (bought_items_indexes.contains(index)){
+        log("l'elemento è già crossato: " );
+        //sposto l'elemento in coda e non incremento il counter
+        //rimuovo l'elemento dall'index attuale e dall bought items indexes
+        bought_items_indexes.removeAt(index);
+        //aggiungo l'elemento in coda alla lista e nell'indexes
+        bought_items_indexes.add(bought_items_indexes.length);
 
+      }else{
+        for(var i = 0; i < bought_items_indexes.length; i++){
+          bought_items_indexes[i]= bought_items_indexes[i]-1;
+        }
+        bought_items_indexes.add(listaSpesa.length-1);
+      }*/
       for(var i = 0; i < bought_items_indexes.length; i++){
         bought_items_indexes[i]= bought_items_indexes[i]-1;
       }
       bought_items_indexes.add(listaSpesa.length-1);
-    }
+
+      }
 
 
     setState(() {
@@ -308,4 +354,48 @@ class _ShoppingListState extends State<ShoppingList> {
       bought_items_index = listaSpesa.length-1;
     });
   }
+
+  Future removeItemFromFirebase( String shoplist_id ,String item_name) async{
+    log("removing from  "+shoplist_id +" item: "+item_name);
+    DatabaseReference databaseReference = FirebaseDatabase.instance.refFromURL(ref).child("shoplists_ids").child(shoplist_id).child(item_name);
+    databaseReference.remove();
+
+  }
+
+  Future crossItemFromFirebase( String shoplist_id ,String item_name) async{
+    log("crossing: " + item_name + " : " +shoplist_id);
+    DatabaseReference databaseReference = FirebaseDatabase.instance.refFromURL(ref).child("shoplists_ids").child(shoplist_id).child(item_name);
+    databaseReference.set("1");
+
+  }
+
+
+  Future getShopList(String shoplist_id) async{
+    log ("getting items from firebase");
+    DatabaseReference databaseReference = FirebaseDatabase.instance.refFromURL(ref).child("shoplists_ids").child(shoplist_id);
+    final snapshot = await databaseReference.get();
+
+    if (snapshot.exists) {
+      print(snapshot.value.toString());
+      String jsonString = snapshot.value.toString();
+      Map? data = snapshot.value as Map?;
+      int currentIndex=0;
+      data?.forEach((key, value) {
+        log( key +" : " + value);
+        listaSpesa.add(key);
+        if (value=="1"){
+          bought_items_indexes.add(currentIndex);
+        }
+        currentIndex++;
+
+      });
+
+      //listaSpesa.add(snapshot.value.toString());
+
+    } else {
+      print('No data available.');
+    }
+  }
+
+
 }

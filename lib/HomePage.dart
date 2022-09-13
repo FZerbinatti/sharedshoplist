@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer';
@@ -57,6 +58,12 @@ class _HomePageState extends State<HomePage> {
                           length, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))));
 
                        String id_spesa = (getRandomString(10));
+
+                      var ref = "https://sharedshoplist-17901-default-rtdb.europe-west1.firebasedatabase.app" ;
+                      DatabaseReference databaseReference = FirebaseDatabase.instance.refFromURL(ref).child("shoplists_ids");
+                      databaseReference.set(id_spesa);
+
+
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
 
                         content: Text("ID Spesa generato: $id_spesa",textAlign: TextAlign.center,),
@@ -130,6 +137,7 @@ class _HomePageState extends State<HomePage> {
     // crea su firebase un oggetto con questo ID
 
   }
+
 
 
 }
